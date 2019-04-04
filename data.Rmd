@@ -1,30 +1,34 @@
 ---
-title: "data"
+title: "Final Project"
 author: "Celia Concannon"
 date: "4/4/2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+I got both of these data sets which I am using from kaggle.com where I made an account to access them.  The stock data contains Tesla stock data from 2010 to present day with the open and close prices, high and low prices, and volume of stock traded.  The Twitter dataset contains the data and time of Elon Musk's tweets and what he tweeted.  Originally I planned on looking at just open and close prices and how what Elon Musk tweeted that day affected those prices.  However, now I also think it would be interesting to look at days with a very high volume of shares of Tesla traded and what he tweeted on that day as well.
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+library(janitor)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stock <- read_csv("Tesla.csv - Tesla.csv.csv")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+tweets <- read_csv("data_elonmusk.csv")
 ```
 
-## Including Plots
+```{r, echo = FALSE}
+stock %>%
+  clean_names() %>%
+  select(date, volume) %>%
+  ggplot(aes(x = date, y = volume)) +
+    geom_point() +
+    labs(x = "Date",
+         y = "Volume") 
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+# From this graph you can see that there are certain dates with huge spikes in volume of Tesla shares traded.  Good basis for explorations.
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
