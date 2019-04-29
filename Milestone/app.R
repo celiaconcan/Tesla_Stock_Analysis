@@ -63,13 +63,7 @@ server <- function(input, output) {
   })
 }
 
-# My plan next to try and figure out how I can have the plot_clicks return a
-# tweet from a certain date. Additionally I have loaded in a data set of S&P 500
-# stock data and want to look at how that compares with changes in tesla opening
-# and closing prices.  This is a very rough display of what I am trying to do, I
-# realize I need to make a lot more progress by demo day.  However, I feel like
-# this is a strong foundation for moving forward as it required me to do a lot
-# of reading on shiny and try many different things.
+
 
 shinyApp(ui, server)
 
