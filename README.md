@@ -1,1 +1,1 @@
-# final_project
+# Stock prices are affected by the public's perception of a company's value.  Tesla's notorious CEO, Elon Musk, has made headlines in recent years for his non-professional behavior.  His actions and words impact how stockholders feel about Tesla and how they value their stock.  This project takes a look at how Tesla's stock is impacted by Elon Musk's tweets.
