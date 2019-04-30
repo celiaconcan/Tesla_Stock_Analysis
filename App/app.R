@@ -18,7 +18,8 @@ tweets <- read_csv("data_elonmusk.csv") %>%
   mutate(time = as.Date(strptime(time, '%Y-%m-%d %H:%M'),format = '%Y-%m-%d')) %>%
   filter(time > "2015-02-08") %>%
   filter(time < "2017-09-29") %>%
-  rename(date = time)
+  rename(date = time) %>%
+  select(date, tweet)
 
 join <- left_join(tesla, tweets, by = "date") %>%
   select(date, open, close, volume, tweet) %>%
@@ -27,12 +28,12 @@ join <- left_join(tesla, tweets, by = "date") %>%
 
 ui <- fluidPage(
   titlePanel("Elon Musk and Tesla Stock"),
-  verbatimTextOutput("info"),
   
   mainPanel(
     tabsetPanel(type = "tabs",
                 tabPanel("Plot", plotlyOutput("plot1")),
-                tabPanel("Summary", verbatimTextOutput("summary"))))
+                tabPanel("Tweets", dataTableOutput("table")),
+                tabPanel("About", htmlOutput("summary"))))
 )
 
 server <- function(input, output) {
@@ -56,10 +57,29 @@ server <- function(input, output) {
     
 
   })
+  output$summary <- renderUI({
+    
+    str1 <- paste("About this App")
+    str2 <- paste("This app explores how Elon Musk's tweets affect the volume and share price of Tesla stock.")
+    str3 <- paste("About the Creator")
+    str4 <- paste("This app was created by Celia Concannon as a final project for GOV1005: Data at Harvard College in Spring 2019.")
+    str5 <- paste("Contact Information")
+    str6 <- paste("Email: celiaconcannon@college.harvard.edu")
+    str7 <- paste("Github Link")
+    str8 <- paste("https://github.com/celiaconcan/Tesla_Stock_Analysis")
+    str9 <- paste("Data Source")
+    str10 <- paste("Kaggle.com")
+    HTML(paste(h3(str1), p(str2), h3(str3), p(str4), h5(str5), p(str6), h5(str7), p(str8), h5(str9), p(str10)))}) 
+  
+  
+  output$table <- DT::renderDataTable({
+    DT::datatable(tweets)
+  })  
+
 }
 
 
 
-shinyApp(ui, server)
+shinyApp(ui = ui, server = server)
 
 

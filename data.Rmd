@@ -12,23 +12,57 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readr)
 library(janitor)
+library(ggpmisc) 
+library(lubridate)
+library(dplyr)
+library(plotly)
 ```
 
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
-stock <- read_csv("Tesla.csv - Tesla.csv.csv")
+tesla <- read_csv("Tesla.csv - Tesla.csv.csv") %>%
+  clean_names() %>%
+  mutate(date = parse_date(date, format = '%m/ %d/ %Y')) %>%
+  filter(date > "2016-02-08") %>%
+  filter(date < "2017-09-29")
 
-tweets <- read_csv("data_elonmusk.csv")
+tweets <- read_csv("data_elonmusk.csv") %>%
+  clean_names() %>%
+  mutate(time = as.Date(strptime(time, '%Y-%m-%d %H:%M:%S'),format = '%Y-%m-%d')) %>%
+  filter(time > "2015-02-08") %>%
+  filter(time < "2017-09-29") %>%
+  rename(date = time)
+
+s_p <- read_csv("Milestone/all_stocks_5yr.csv") %>%
+  filter(date > "2015-02-08") %>%
+  filter(date < "2017-09-29")
+
+join <- left_join(tesla, tweets, by = "date") %>%
+  select(date, open, close, volume, tweet) %>%
+  group_by(date) %>%
+  summarize(tweet = sample(tweet, 1),
+            open = mean(open),
+            close = mean(close),
+            volume = mean(volume))
 ```
 
 ```{r, echo = FALSE}
-stock %>%
-  clean_names() %>%
+tesla %>%
   select(date, volume) %>%
-  ggplot(aes(x = date, y = volume)) +
-    geom_point() +
+  ggplotly(as.numeric = FALSE, aes(x = date, y = volume)) +
+    geom_line() +
+    scale_y_continuous(labels = scales::comma) +
     labs(x = "Date",
-         y = "Volume") 
+         y = "Volume") +
+     stat_peaks(colour = "red") +
+     stat_peaks(geom = "text", colour = "red", angle = 66,
+             hjust = -0.1, x.label.fmt = "%m-%d", ignore_threshold = 0.5) +
+     stat_peaks(geom = "rug", colour = "red", sides = "b") +
+     expand_limits(y = 80)
+```
 
 # From this graph you can see that there are certain dates with huge spikes in volume of Tesla shares traded.  Good basis for explorations.
+```{r}
+
 ```
+
