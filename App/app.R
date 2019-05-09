@@ -4,6 +4,7 @@ library(janitor)
 library(ggpmisc) 
 library(lubridate)
 library(plotly)
+library(shinythemes)
 library(DT)
 
 
@@ -34,17 +35,34 @@ join <- left_join(tesla, tweets, by = "date") %>%
 # Joins the two data sets by date and creates a new variable called tweetDisplay
 # which I will use in my plotly hover feature.
 
-ui <- fluidPage(
-  titlePanel("Elon Musk and Tesla Stock"),
+ui <- navbarPage("Elon Musk and Tesla Stock", 
+                 theme = shinytheme("yeti"),
   
 # Gives a title to the app.  
   
   mainPanel(
     tabsetPanel(type = "tabs",
-                tabPanel("Plot", plotlyOutput("plot1")),
-                tabPanel("Tweets", dataTableOutput("table")),
-                tabPanel("About", htmlOutput("summary"))))
-)
+                tabPanel("Volume", plotlyOutput("plot1")),
+                tabPanel("Stock Price",
+                                                       
+                                                       br(),
+                                                       
+                                                       sidebarPanel(
+                                                         selectInput("var",
+                                                                     label = "Choose a variable to display",
+                                                                     choices = c("Closing Price", "Opening Price"),
+                                                                     selected = "Closing Price")
+                                                       ),
+                                                       mainPanel(
+                                                         plotlyOutput("plot2"),
+                                                         br()
+                                                       ),
+                                                       br()
+                ),
+                
+                tabPanel("Search Tweets", dataTableOutput("table")),
+                tabPanel("About", htmlOutput("summary")))
+))
 
 # Creates my tabs, I plan on creating additional tabs by the due date.  I also
 # want to show how tweets affect stock closing prices.
@@ -71,12 +89,39 @@ server <- function(input, output) {
     p %>%
       ggplotly()
     
+  })
+  data <- reactive({
+    switch(input$var,
+           close = join$close,
+           open = join$open,
+    )
+    
+  })
+  output$plot2 <- renderPlotly({
+      
+    c <- join %>%
+      select(date, open, close, tweet, tweetDisplay) %>%
+      filter(!is.na(tweet)) %>%
+      ggplot(aes(x = date, y = close, text = tweetDisplay)) +
+      geom_point(size = 0.7, color = 'red') +
+      geom_line(group = 1) +
+      scale_y_continuous() +
+
+        # Without the group aesthetic the line does not show up.
+
+        
+      labs(x = "Date",
+           y = "Price") 
+      
+    c %>%
+      ggplotly()
+      
+
 # This has the shiny app create my ggplot, which shows peaks in tesla stock
 # volume. ggplotly() wraps the ggplot in a plotly and allows me to use the hover
-# function to see text for each point.  I would like to use similar code going
-# forward to create a similar graph but using closing prices instead of volume.
-
+# function to see text for each point.
   })
+
   output$summary <- renderUI({
     
     str1 <- paste("About this App")
