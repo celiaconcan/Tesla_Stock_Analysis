@@ -102,7 +102,7 @@ server <- function(input, output) {
     c <- join %>%
       select(date, open, close, tweet, tweetDisplay) %>%
       filter(!is.na(tweet)) %>%
-      ggplot(aes(x = date, y = close, text = tweetDisplay)) +
+      ggplot(aes(x = date, y = data, text = tweetDisplay)) +
       geom_point(size = 0.7, color = 'red') +
       geom_line(group = 1) +
       scale_y_continuous() +
