@@ -42,7 +42,10 @@ ui <- navbarPage("Elon Musk and Tesla Stock",
   
   mainPanel(
     tabsetPanel(type = "tabs",
-                tabPanel("Volume", plotlyOutput("plot1")),
+                tabPanel("Volume",
+                         plotlyOutput("plot1"),
+                         br(),
+                         h6("Volume is the number of shares or contracts traded in a security during a given period of time.  Higher volume indicates higher interest in a stock on a certain day.  This graph shows spikes in volume of Tesla stock traded over a period of two and a half years and the corresponding Elon Musk tweets on those days.")),
                 tabPanel("Stock Price",
                                                        
                                                        br(),
@@ -57,7 +60,8 @@ ui <- navbarPage("Elon Musk and Tesla Stock",
                                                          plotlyOutput("plot2"),
                                                          br()
                                                        ),
-                                                       br()
+                                                       br(),
+                                                       h6("The price movement of a stock is an indication of how much investors value a company at a certain time.")
                 ),
                 
                 tabPanel("Search Tweets", dataTableOutput("table")),
@@ -74,7 +78,7 @@ server <- function(input, output) {
       select(date, volume, tweet, tweetDisplay) %>%
       filter(!is.na(tweet)) %>%
       ggplot(aes(x = date, y = volume, text = tweetDisplay)) +
-      geom_point(size = 0.7, color = 'red') +
+      geom_point(size = 0.7, color = 'blue') +
       geom_line(group = 1) +
       
 # Without the group aesthetic the line does not show up.
@@ -90,31 +94,47 @@ server <- function(input, output) {
       ggplotly()
     
   })
-  data <- reactive({
-    switch(input$var,
-           close = join$close,
-           open = join$open,
-    )
-    
-  })
-  output$plot2 <- renderPlotly({
-      
+  
+output$plot2 <- renderPlotly({  
+  if(input$var == "Opening Price") {
     c <- join %>%
       select(date, open, close, tweet, tweetDisplay) %>%
       filter(!is.na(tweet)) %>%
-      ggplot(aes(x = date, y = data, text = tweetDisplay)) +
+      ggplot(aes(x = date, y = open, text = tweetDisplay)) +
+      geom_point(size = 0.7, color = 'green') +
+      geom_line(group = 1) +
+      scale_y_continuous() +
+      
+      # Without the group aesthetic the line does not show up.
+      
+      
+      labs(x = "Date",
+           y = "Price") 
+    
+    c %>%
+      ggplotly()
+
+  } else {
+    c <- join %>%
+      select(date, open, close, tweet, tweetDisplay) %>%
+      filter(!is.na(tweet)) %>%
+      ggplot(aes(x = date, y = close, text = tweetDisplay)) +
       geom_point(size = 0.7, color = 'red') +
       geom_line(group = 1) +
       scale_y_continuous() +
-
-        # Without the group aesthetic the line does not show up.
-
-        
+      
+      # Without the group aesthetic the line does not show up.
+      
+      
       labs(x = "Date",
            y = "Price") 
-      
+    
     c %>%
       ggplotly()
+  }
+
+      
+
       
 
 # This has the shiny app create my ggplot, which shows peaks in tesla stock
