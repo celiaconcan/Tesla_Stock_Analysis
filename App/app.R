@@ -68,7 +68,11 @@ ui <- navbarPage("Elon Musk and Tesla Stock",
 # Creates a user select feature in the stock price tab which allows the user to
 # select between closing prices and opening prices to be displayed.
                 
-                tabPanel("Search Tweets", dataTableOutput("table")),
+                tabPanel("Search Tweets", 
+                         dataTableOutput("table"),
+                         br(),
+                         h6("This searchable data table can be used to explore all of Elon Musk's tweets by date or keyword.")
+                         ),
                 tabPanel("About", htmlOutput("summary")))
 ))
 
