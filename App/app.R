@@ -15,7 +15,7 @@ tesla <- read_csv("Tesla.csv - Tesla.csv.csv") %>%
   filter(date < "2017-09-29")
 
 # I picked this date range as a reasonale amount of time to display on the
-# x-axis of the graph without it being cluttered with two many points.
+# x-axis of the graph without it being cluttered with too many points.
 
 tweets <- read_csv("data_elonmusk.csv") %>%
   clean_names() %>%
@@ -26,7 +26,7 @@ tweets <- read_csv("data_elonmusk.csv") %>%
   select(date, tweet)
 
 # Had to clean, names, get the date columns to match and to be in the same date
-# range so I could join the two.
+# range so I could join the two by date.
 
 join <- left_join(tesla, tweets, by = "date") %>%
   select(date, open, close, volume, tweet) %>%
@@ -38,7 +38,8 @@ join <- left_join(tesla, tweets, by = "date") %>%
 ui <- navbarPage("Elon Musk and Tesla Stock", 
                  theme = shinytheme("yeti"),
   
-# Gives a title to the app.  
+# Gives a title to the app and adds the yeti theme from the shiny themes
+# package.
   
   mainPanel(
     tabsetPanel(type = "tabs",
@@ -63,13 +64,16 @@ ui <- navbarPage("Elon Musk and Tesla Stock",
                                                        br(),
                                                        h6("The price movement of a stock is an indication of how much investors value a company at a certain time.")
                 ),
+
+# Creates a user select feature in the stock price tab which allows the user to
+# select between closing prices and opening prices to be displayed.
                 
                 tabPanel("Search Tweets", dataTableOutput("table")),
                 tabPanel("About", htmlOutput("summary")))
 ))
 
-# Creates my tabs, I plan on creating additional tabs by the due date.  I also
-# want to show how tweets affect stock closing prices.
+# tabPanel creates all my tabs, which the user can click between to view
+# different features of the app.
 
 server <- function(input, output) {
   output$plot1 <- renderPlotly({
@@ -77,8 +81,19 @@ server <- function(input, output) {
     p <- join %>%
       select(date, volume, tweet, tweetDisplay) %>%
       filter(!is.na(tweet)) %>%
+      
+# Removes all tweets which are NA.
+      
       ggplot(aes(x = date, y = volume, text = tweetDisplay)) +
+      
+# Creates a graph with date on the x-axis and volume on the y-axis, with the
+# text for the plotly hover feature to be the tweetDisplay variable I created
+# above.
+      
       geom_point(size = 0.7, color = 'blue') +
+      
+# Alters the size and color of the points on the graph.
+      
       geom_line(group = 1) +
       
 # Without the group aesthetic the line does not show up.
@@ -89,11 +104,15 @@ server <- function(input, output) {
   
       labs(x = "Date",
            y = "Volume") 
+
+# Names the axis of the graph.    
     
     p %>%
       ggplotly()
     
   })
+  
+# Wraps the ggplot with plotly to make it interactive.
   
 output$plot2 <- renderPlotly({  
   if(input$var == "Opening Price") {
@@ -104,16 +123,12 @@ output$plot2 <- renderPlotly({
       geom_point(size = 0.7, color = 'green') +
       geom_line(group = 1) +
       scale_y_continuous() +
-      
-      # Without the group aesthetic the line does not show up.
-      
-      
       labs(x = "Date",
            y = "Price") 
     
     c %>%
       ggplotly()
-
+    
   } else {
     c <- join %>%
       select(date, open, close, tweet, tweetDisplay) %>%
@@ -122,10 +137,6 @@ output$plot2 <- renderPlotly({
       geom_point(size = 0.7, color = 'red') +
       geom_line(group = 1) +
       scale_y_continuous() +
-      
-      # Without the group aesthetic the line does not show up.
-      
-      
       labs(x = "Date",
            y = "Price") 
     
@@ -133,13 +144,9 @@ output$plot2 <- renderPlotly({
       ggplotly()
   }
 
-      
-
-      
-
-# This has the shiny app create my ggplot, which shows peaks in tesla stock
-# volume. ggplotly() wraps the ggplot in a plotly and allows me to use the hover
-# function to see text for each point.
+# This is the same code I used in my graph which looks at stock volume, but
+# looking at the user selected variable, either opening price or closing price.
+  
   })
 
   output$summary <- renderUI({
