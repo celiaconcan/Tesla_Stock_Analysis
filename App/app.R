@@ -42,7 +42,7 @@ ui <- navbarPage("Elon Musk and Tesla Stock",
   
   mainPanel(
     tabsetPanel(type = "tabs",
-                tabPanel("Volume",
+                tabPanel("Stock Volume",
                          plotlyOutput("plot1"),
                          br(),
                          h6("Volume is the number of shares or contracts traded in a security during a given period of time.  Higher volume indicates higher interest in a stock on a certain day.  This graph shows spikes in volume of Tesla stock traded over a period of two and a half years and the corresponding Elon Musk tweets on those days.")),
