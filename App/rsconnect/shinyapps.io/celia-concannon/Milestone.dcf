@@ -5,9 +5,9 @@ account: celia-concannon
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 877609
-bundleId: 2042662
+bundleId: 2050300
 url: https://celia-concannon.shinyapps.io/Milestone/
-when: 1556330007.39164
+when: 1556643144.72052
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: all_stocks_5yr.csv|data_elonmusk.csv
+ignoredFiles: all_stocks_5yr.csv
